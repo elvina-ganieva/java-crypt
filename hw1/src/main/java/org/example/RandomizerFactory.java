@@ -5,13 +5,13 @@ import java.util.Random;
 
 public class RandomizerFactory {
 
-    static Random getRandomizer(String param) {
-        if (param.equals("Basic")) {
+    static Random getRandomizer(String mode) {
+        if (mode.equals("Basic")) {
             return new Random();
-        } else if (param.equals("Secure")) {
+        } else if (mode.equals("Secure")) {
             return new SecureRandom();
         } else {
-            throw new IllegalArgumentException("Неизвестный параметр: " + param);
+            throw new IllegalArgumentException("Неизвестный параметр: " + mode);
         }
     }
 }
