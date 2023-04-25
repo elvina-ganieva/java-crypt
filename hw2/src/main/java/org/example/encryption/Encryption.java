@@ -1,8 +1,8 @@
 package org.example.encryption;
 
 import org.example.common.CipherService;
-import org.example.common.DataRepository;
-import org.example.common.KeyInitializer;
+import org.example.common.DataAccessService;
+import org.example.common.KeyHandler;
 
 import javax.crypto.Cipher;
 import java.util.Arrays;
@@ -17,13 +17,13 @@ public class Encryption {
         var secretWord = args[0];
         var hashOfSecretWord = secretWord.hashCode();
 
-        var key = new KeyInitializer().initializeKey();
+        var key = new KeyHandler().initializeKey();
         var cipheredSecretWord = new CipherService().cipher(Cipher.ENCRYPT_MODE, key, secretWord.getBytes());
 
         System.out.printf("hash: %s%nciphered word: %s%n", hashOfSecretWord, Arrays.toString(cipheredSecretWord));
 
-        var repo = new DataRepository();
-        repo.saveHashCode(hashOfSecretWord);
-        repo.saveCipheredWord(cipheredSecretWord);
+        var dataAccessService = new DataAccessService();
+        dataAccessService.saveHashCode(hashOfSecretWord);
+        dataAccessService.saveCipheredWord(cipheredSecretWord);
     }
 }

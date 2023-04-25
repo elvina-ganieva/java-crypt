@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class DataRepository {
+public class DataAccessService {
 
     public void saveHashCode(int hashCode) {
         var pathForHash = Paths.get("hw2/hash.txt");
