@@ -16,7 +16,9 @@ public class KeyHandler {
     public Key retrieveExistingKey() {
         try {
             var keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(new FileInputStream(keyStoreFileName), new char[0]);
+            try (var fis = new FileInputStream(keyStoreFileName)) {
+                keyStore.load(fis, new char[0]);
+            }
             return keyStore.getKey(keyAlias, new char[0]);
         } catch (Exception e) {
             throw new RuntimeException(e);
