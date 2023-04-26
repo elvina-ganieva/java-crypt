@@ -14,9 +14,10 @@ public class KeyHandler {
     private static final String keyStoreType = "JCEKS";
     private static final String keyStorePassEnv = "KEYSTORE_PASS";
 
-    public Key retrieveExistingKey() {
+    public Key getKey() {
         try {
             var password = System.getenv(keyStorePassEnv).toCharArray();
+
             var keyStore = KeyStore.getInstance(keyStoreType);
             try (var fis = new FileInputStream(keyStoreFileName)) {
                 keyStore.load(fis, password);
@@ -48,8 +49,11 @@ public class KeyHandler {
     private void saveKeyToStore(SecretKey key) {
         try {
             var password = System.getenv(keyStorePassEnv).toCharArray();
+
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, password);
+            try (var fis = new FileInputStream(keyStoreFileName)) {
+                keyStore.load(fis, password);
+            }
 
             var secretKeyEntry = new KeyStore.SecretKeyEntry(key);
             keyStore.setEntry(

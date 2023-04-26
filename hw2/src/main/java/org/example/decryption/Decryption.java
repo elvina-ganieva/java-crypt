@@ -12,7 +12,7 @@ public class Decryption {
         var hashCode = dataAccessService.getHashCode();
         var cipheredWord = dataAccessService.getCipheredWord();
 
-        var key = new KeyHandler().retrieveExistingKey();
+        var key = new KeyHandler().getKey();
         var decryptedWord = new CipherService().cipher(Cipher.DECRYPT_MODE, key, cipheredWord);
 
         var result = new String(decryptedWord);
