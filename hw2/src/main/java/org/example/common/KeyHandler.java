@@ -12,14 +12,16 @@ public class KeyHandler {
     private static final String keyStoreFileName = "myKeyStore.jks";
     private static final String keyAlias = "my-key";
     private static final String keyStoreType = "JCEKS";
+    private static final String keyStorePassEnv = "KEYSTORE_PASS";
 
     public Key retrieveExistingKey() {
         try {
+            var password = System.getenv(keyStorePassEnv).toCharArray();
             var keyStore = KeyStore.getInstance(keyStoreType);
             try (var fis = new FileInputStream(keyStoreFileName)) {
-                keyStore.load(fis, new char[0]);
+                keyStore.load(fis, password);
             }
-            return keyStore.getKey(keyAlias, new char[0]);
+            return keyStore.getKey(keyAlias, password);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -45,14 +47,19 @@ public class KeyHandler {
 
     private void saveKeyToStore(SecretKey key) {
         try {
+            var password = System.getenv(keyStorePassEnv).toCharArray();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
+            keyStore.load(null, password);
 
             var secretKeyEntry = new KeyStore.SecretKeyEntry(key);
-            keyStore.setEntry(keyAlias, secretKeyEntry, new KeyStore.PasswordProtection(new char[0]));
+            keyStore.setEntry(
+                    keyAlias,
+                    secretKeyEntry,
+                    new KeyStore.PasswordProtection(password)
+            );
 
             try (var fos = new FileOutputStream(keyStoreFileName)) {
-                keyStore.store(fos, new char[0]);
+                keyStore.store(fos, password);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
