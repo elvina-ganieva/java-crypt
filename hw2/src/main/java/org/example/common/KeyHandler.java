@@ -50,7 +50,7 @@ public class KeyHandler {
         try {
             var password = System.getenv(keyStorePassEnv).toCharArray();
 
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            var keyStore = KeyStore.getInstance(keyStoreType);
             try (var fis = new FileInputStream(keyStoreFileName)) {
                 keyStore.load(fis, password);
             }
