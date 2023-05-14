@@ -1,0 +1,21 @@
+package org.example;
+
+import org.example.common.DataTransferService;
+import org.example.service.*;
+
+import javax.crypto.Cipher;
+
+public class Decryption {
+
+    public static void main(String[] args) {
+        var dataTransferService = new DataTransferService();
+        var dto = dataTransferService.readObject();
+
+        var keyStoreService = new KeyStoreService();
+        var key = keyStoreService.getSecretKey();
+
+        var cipherService = new CipherService();
+        var decipheredData = cipherService.cipher(Cipher.DECRYPT_MODE, key, dto.cipheredText());
+        System.out.println("Расшифрованный текст: " + new String(decipheredData));
+    }
+}
