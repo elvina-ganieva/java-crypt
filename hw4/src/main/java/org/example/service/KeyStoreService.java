@@ -16,13 +16,13 @@ public class KeyStoreService {
 
     public void storeSecretKey(SecretKey secretKey) {
         var keyStore = getKeyStore();
-        loadKeyStore(keyStore);
+        loadEmptyKeyStore(keyStore);
         var entry = new KeyStore.SecretKeyEntry(secretKey);
         var password = new KeyStore.PasswordProtection(System.getenv(KEYSTORE_PASS).toCharArray());
         try {
             keyStore.setEntry(KEY_ALIAS, entry, password);
         } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Не удалось сохранить запись с alias " + KEY_ALIAS, e);
         }
         storeKeyStore(keyStore);
     }
@@ -52,6 +52,14 @@ public class KeyStoreService {
             keyStore.load(fis, password);
         } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
             throw new RuntimeException("Не удалось загрузить keyStore из " + KEYSTORE_FILE_NAME, e);
+        }
+    }
+
+    private void loadEmptyKeyStore(KeyStore keyStore) {
+        try {
+            keyStore.load(null, null);
+        } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
+            throw new RuntimeException("Не удалось загрузить пустой keyStore", e);
         }
     }
 
