@@ -5,6 +5,7 @@ import org.example.dto.Dto;
 import org.example.service.*;
 
 import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
 
 public class Encryption {
 
@@ -21,7 +22,7 @@ public class Encryption {
         var key = keyGenerator.generateKey(password, salt.getBytes());
 
         var cipherService = new CipherService();
-        var cipheredData = cipherService.cipher(Cipher.ENCRYPT_MODE, key, "Java".getBytes());
+        var cipheredData = cipherService.cipher(Cipher.ENCRYPT_MODE, key, "Java".getBytes(StandardCharsets.UTF_8));
 
         var dataTransferService = new DataTransferService();
         dataTransferService.writeObject(new Dto(cipheredData));
