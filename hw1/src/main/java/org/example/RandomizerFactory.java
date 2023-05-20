@@ -6,12 +6,12 @@ import java.util.Random;
 public class RandomizerFactory {
 
     static Random getRandomizer(String mode) {
-        if (mode.equals("Basic")) {
+        if (Mode.BASIC.toString().equalsIgnoreCase(mode)) {
             return new Random(System.nanoTime());
-        } else if (mode.equals("Secure")) {
+        } else if (Mode.SECURE.toString().equalsIgnoreCase(mode)) {
             return new SecureRandom(new byte[]{(byte) System.nanoTime()});
         } else {
-            throw new IllegalArgumentException("����������� ��������: " + mode);
+            throw new RuntimeException("Способ получения прогноза должен быть либо Basic, либо Secure. Текущий способ: " + mode);
         }
     }
 }
