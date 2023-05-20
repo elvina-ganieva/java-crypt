@@ -33,6 +33,7 @@ public class KeyStoreService {
         var password = System.getenv(KEYSTORE_PASS).toCharArray();
         var keyStore = getKeyStore();
         loadKeyStoreByFileName(keyStore, fileName);
+
         try {
             return keyStore.getKey(keyAlias, password);
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
