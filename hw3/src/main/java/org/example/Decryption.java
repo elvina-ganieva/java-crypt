@@ -1,21 +1,27 @@
 package org.example;
 
-import org.example.common.DataTransferService;
+import org.example.service.DataTransferService;
 import org.example.service.*;
 
 import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
 
 public class Decryption {
 
     public static void main(String[] args) {
-        var dto = new DataTransferService().readObject();
+        var dataTransferService = new DataTransferService();
+        var dto = dataTransferService.readObject();
 
-        var privateKey = new KeyStoreService().getPrivateKey();
+        var keyStoreService = new KeyStoreService();
+        var privateKey = keyStoreService.getPrivateKey();
 
-        var decipheredData = new CipherService().cipher(Cipher.DECRYPT_MODE, privateKey, dto.cipheredText());
-        System.out.println("Расшифрованный текст: " + new String(decipheredData));
+        var cipherService = new CipherService();
+        var decipheredData = cipherService.cipher(Cipher.DECRYPT_MODE, privateKey, dto.cipheredText());
 
-        var isSignOk = new SignatureService().verifySignature(dto.cipheredText(), dto.publicKey(), dto.signature());
+        System.out.println("Расшифрованный текст: " + new String(decipheredData, StandardCharsets.UTF_8));
+
+        var signatureService = new SignatureService();
+        var isSignOk = signatureService.verifySignature(dto.cipheredText(), dto.publicKey(), dto.signature());
         if (isSignOk) {
             System.out.println("Sign is ok.");
         }

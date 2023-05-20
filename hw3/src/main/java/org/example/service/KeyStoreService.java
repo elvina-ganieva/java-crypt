@@ -17,59 +17,65 @@ public class KeyStoreService {
 
     public PrivateKey getPrivateKey() {
         var password = System.getenv(KEYSTORE_PASS).toCharArray();
-        var keyStore = loadKeyStore();
+        var keyStore = getKeyStoreInstance();
+        loadExistingKeyStore(keyStore);
 
         try {
             return (PrivateKey) keyStore.getKey(KEY_ALIAS, password);
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
-            throw new RuntimeException("Не удалось достать приватный ключ из KeyStore.", e);
+            throw new RuntimeException("Не удалось достать приватный ключ из KeyStore по alias: " + KEY_ALIAS, e);
         }
     }
 
-    public void storePrivateKey(PrivateKey privateKey, String keyAlias) {
-        var keyStore = loadKeyStore();
-        storePrivateKey(keyStore, privateKey, keyAlias);
-    }
+    public void storePrivateKey(PrivateKey privateKey) {
+        var keyStore = getKeyStoreInstance();
+        loadExistingKeyStore(keyStore);
 
-    private KeyStore loadKeyStore() {
+        var certificateChain = getCertificateChain(keyStore);
         var password = System.getenv(KEYSTORE_PASS).toCharArray();
+        var entry = new KeyStore.PrivateKeyEntry(privateKey, certificateChain);
 
-        KeyStore keyStore;
         try {
-            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        } catch (KeyStoreException e) {
-            throw new RuntimeException("KeyStore не найден.", e);
+            keyStore.setEntry(KEY_ALIAS, entry, new KeyStore.PasswordProtection(password));
+        } catch (KeyStoreException | NullPointerException e) {
+            throw new RuntimeException("Не удалось добавить запись в KeyStore.", e);
         }
+        storeKeyStoreInFile(keyStore);
+    }
 
+    private KeyStore getKeyStoreInstance() {
+        try {
+            return KeyStore.getInstance(KeyStore.getDefaultType());
+        } catch (KeyStoreException e) {
+            throw new RuntimeException("Не удалось создать экземпляр KeyStore с дефолтным типом: " + KeyStore.getDefaultType(), e);
+        }
+    }
+
+    private void loadExistingKeyStore(KeyStore keyStore) {
+        var password = System.getenv(KEYSTORE_PASS).toCharArray();
         try (var fis = new FileInputStream(KEYSTORE_FILE_NAME)) {
             keyStore.load(fis, password);
-        } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
+        } catch (IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Не удалось загрузить KeyStore из файла: " + KEYSTORE_FILE_NAME, e);
         }
-        return keyStore;
     }
 
-    private void storePrivateKey(KeyStore keyStore, PrivateKey privateKey, String alias) {
+    private void storeKeyStoreInFile(KeyStore keyStore) {
+        var password = System.getenv(KEYSTORE_PASS).toCharArray();
+        try (var fos = new FileOutputStream(KEYSTORE_FILE_NAME)) {
+            keyStore.store(fos, password);
+        } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Не удалось сохранить KeyStore в файл: " + KEYSTORE_FILE_NAME, e);
+        }
+    }
+
+    private X509Certificate[] getCertificateChain(KeyStore keyStore) {
         Certificate certificate;
         try {
             certificate = keyStore.getCertificate(CERTIFICATE_ALIAS);
         } catch (KeyStoreException e) {
             throw new RuntimeException("Данный сертификат не найден: " + CERTIFICATE_ALIAS, e);
         }
-
-        var entry = new KeyStore.PrivateKeyEntry(privateKey, new X509Certificate[]{(X509Certificate) certificate});
-        var password = System.getenv(KEYSTORE_PASS).toCharArray();
-
-        try {
-            keyStore.setEntry(alias, entry, new KeyStore.PasswordProtection(password));
-        } catch (KeyStoreException | NullPointerException e) {
-            throw new RuntimeException("Не удалось добавить запись в KeyStore.", e);
-        }
-
-        try (var fos = new FileOutputStream(KEYSTORE_FILE_NAME)) {
-            keyStore.store(fos, password);
-        } catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
-            throw new RuntimeException("Не удалось добавить запись в KeyStore.", e);
-        }
+        return new X509Certificate[]{(X509Certificate) certificate};
     }
 }
