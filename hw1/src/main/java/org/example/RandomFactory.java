@@ -3,9 +3,9 @@ package org.example;
 import java.security.SecureRandom;
 import java.util.Random;
 
-interface RandomizerFactory {
+interface RandomFactory {
 
-    static Random getRandomizer(String mode) {
+    static Random getRandom(String mode) {
         if (Mode.BASIC.toString().equalsIgnoreCase(mode)) {
             return new Random(System.nanoTime());
         } else if (Mode.SECURE.toString().equalsIgnoreCase(mode)) {
