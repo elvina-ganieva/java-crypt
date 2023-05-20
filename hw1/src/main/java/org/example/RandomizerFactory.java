@@ -3,7 +3,7 @@ package org.example;
 import java.security.SecureRandom;
 import java.util.Random;
 
-public class RandomizerFactory {
+interface RandomizerFactory {
 
     static Random getRandomizer(String mode) {
         if (Mode.BASIC.toString().equalsIgnoreCase(mode)) {
