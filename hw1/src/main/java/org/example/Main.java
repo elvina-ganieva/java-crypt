@@ -1,16 +1,21 @@
 package org.example;
 
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         if (args.length != 2) {
-            throw new IllegalArgumentException("Требуется 2 параметра на входе.");
+            System.out.println("Требуется 2 параметра на входе.");
+            return;
         }
+        var userName = args[0];
+        var mode = args[1];
 
-        var options = new String[]{"У вас сегодня будет удача в делах!", "Сегодня хороший день для саморазвития!"};
+        var options = List.of("У вас сегодня будет удача в делах!", "Сегодня хороший день для саморазвития!");
 
-        var randomizer = RandomizerFactory.getRandomizer(args[1]);
-        int arrayIndex = randomizer.nextInt(0, options.length);
+        var random = RandomFactory.getRandom(mode);
+        int arrayIndex = random.nextInt(0, options.size());
 
-        System.out.println(args[0] + ", " + options[arrayIndex]);
+        System.out.println(userName + ", " + options.get(arrayIndex));
     }
 }
