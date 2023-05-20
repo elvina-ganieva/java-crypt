@@ -19,11 +19,13 @@ public class KeyStoreService {
         loadEmptyKeyStore(keyStore);
         var entry = new KeyStore.SecretKeyEntry(secretKey);
         var password = new KeyStore.PasswordProtection(System.getenv(KEYSTORE_PASS).toCharArray());
+
         try {
             keyStore.setEntry(KEY_ALIAS, entry, password);
         } catch (KeyStoreException e) {
             throw new RuntimeException("Не удалось сохранить запись с alias " + KEY_ALIAS, e);
         }
+
         storeKeyStore(keyStore);
     }
 
@@ -31,6 +33,7 @@ public class KeyStoreService {
         var password = System.getenv(KEYSTORE_PASS).toCharArray();
         var keyStore = getKeyStore();
         loadKeyStore(keyStore);
+
         try {
             return (SecretKey) keyStore.getKey(KEY_ALIAS, password);
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {

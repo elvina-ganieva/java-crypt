@@ -11,14 +11,18 @@ public class KeyGenerator {
 
     private static final String KEY_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String ALGORITHM = "AES";
+    private static final int KEY_SIZE = 256;
     private final KeyStoreService keyStoreService;
 
     public KeyGenerator(KeyStoreService keyStoreService) {
         this.keyStoreService = keyStoreService;
     }
 
-    public SecretKey generateKey(String password, byte[] salt) {
-        var keySpec = new PBEKeySpec(password.toCharArray(), salt, Short.MAX_VALUE, 256);
+    public SecretKey generateKey(String password) {
+        var salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+
+        var keySpec = new PBEKeySpec(password.toCharArray(), salt, Short.MAX_VALUE, KEY_SIZE);
         var keyFactory = getSecretKeyFactory();
         var secretKey = getSecretKey(keyFactory, keySpec);
         keyStoreService.storeSecretKey(secretKey);

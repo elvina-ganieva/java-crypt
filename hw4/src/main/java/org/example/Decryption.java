@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.common.DataTransferService;
+import org.example.service.DataTransferService;
 import org.example.service.*;
 
 import javax.crypto.Cipher;
@@ -17,6 +17,7 @@ public class Decryption {
 
         var cipherService = new CipherService();
         var decipheredData = cipherService.cipher(Cipher.DECRYPT_MODE, key, dto.cipheredText());
+
         System.out.println("Расшифрованный текст: " + new String(decipheredData, StandardCharsets.UTF_8));
     }
 }
