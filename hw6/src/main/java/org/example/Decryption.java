@@ -14,6 +14,7 @@ public class Decryption {
         var dto = dataTransferService.readObject();
 
         var keyStoreType = dto.keyStoreType();
+        var keyStoreFileName = dto.keyStoreFileName();
         var password = dto.password();
         var cipheredData = dto.cipheredData();
         var digitalSignature = dto.signature();
@@ -27,8 +28,8 @@ public class Decryption {
             return;
         }
 
-        var keyStoreService = new KeyStoreService();
-        var privateKey = keyStoreService.getPrivateKey(privateKeyAlias, keyStoreType, password);
+        var keyStoreService = new KeyStoreService(keyStoreFileName, keyStoreType, password);
+        var privateKey = keyStoreService.getPrivateKey(privateKeyAlias);
 
         var cipherService = new CipherService();
         var decipheredData = cipherService.decipher(cipheredData, privateKey);

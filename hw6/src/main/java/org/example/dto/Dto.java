@@ -7,8 +7,8 @@ import java.security.PublicKey;
 
 public record Dto(
         byte[] cipheredData,
-
-        KeyStoreType keyStoreType,
+        String keyStoreType,
+        String keyStoreFileName,
         char[] password,
         PublicKey publicKey,
         String privateKeyAlias,

@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.enums.KeyStoreType;
 import sun.security.tools.keytool.CertAndKeyGen;
 
 import java.io.FileInputStream;
@@ -13,15 +12,25 @@ import java.security.cert.X509Certificate;
 
 public class KeyStoreService {
 
-    public void createNewKeyStore(KeyStoreType keyStoreType, char[] password) {
-        var keyStore = getKeyStore(keyStoreType.name());
-        loadNewKeyStore(keyStore);
-        storeKeyStore(keyStore, keyStoreType.getFileName(), password);
+    private final String keyStoreFileName;
+    private final String keyStoreType;
+    private final char[] password;
+
+    public KeyStoreService(String keyStoreFileName, String keyStoreType, char[] password) {
+        this.keyStoreFileName = keyStoreFileName;
+        this.keyStoreType = keyStoreType;
+        this.password = password;
     }
 
-    public PrivateKey getPrivateKey(String keyAlias, KeyStoreType keyStoreType, char[] password) {
-        var keyStore = getKeyStore(keyStoreType.name());
-        loadExistingKeyStore(keyStore, password, keyStoreType.getFileName());
+    public void createNewKeyStore() {
+        var keyStore = getKeyStore();
+        loadNewKeyStore(keyStore);
+        storeKeyStore(keyStore);
+    }
+
+    public PrivateKey getPrivateKey(String keyAlias) {
+        var keyStore = getKeyStore();
+        loadExistingKeyStore(keyStore);
 
         try {
             return (PrivateKey) keyStore.getKey(keyAlias, password);
@@ -30,9 +39,9 @@ public class KeyStoreService {
         }
     }
 
-    public void storePrivateKey(CertAndKeyGen generator, String keyAlias, KeyStoreType keyStoreType, char[] password) {
-        var keyStore = getKeyStore(keyStoreType.name());
-        loadExistingKeyStore(keyStore, password, keyStoreType.getFileName());
+    public void storePrivateKey(CertAndKeyGen generator, String keyAlias) {
+        var keyStore = getKeyStore();
+        loadExistingKeyStore(keyStore);
 
         var certificateChain = getCertificateChain(generator);
 
@@ -41,10 +50,10 @@ public class KeyStoreService {
         } catch (KeyStoreException e) {
             throw new RuntimeException("Не удалось создать сделать запись KeyEntry.", e);
         }
-        storeKeyStore(keyStore, keyStoreType.getFileName(), password);
+        storeKeyStore(keyStore);
     }
 
-    private KeyStore getKeyStore(String keyStoreType) {
+    private KeyStore getKeyStore() {
         try {
             return KeyStore.getInstance(keyStoreType);
         } catch (KeyStoreException e) {
@@ -60,7 +69,7 @@ public class KeyStoreService {
         }
     }
 
-    private void loadExistingKeyStore(KeyStore keyStore, char[] password, String keyStoreFileName) {
+    private void loadExistingKeyStore(KeyStore keyStore) {
         try (var fis = new FileInputStream(keyStoreFileName)) {
             keyStore.load(fis, password);
         } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
@@ -68,7 +77,7 @@ public class KeyStoreService {
         }
     }
 
-    private void storeKeyStore(KeyStore keyStore, String keyStoreFileName, char[] password) {
+    private void storeKeyStore(KeyStore keyStore) {
         try (var fos = new FileOutputStream(keyStoreFileName)) {
             keyStore.store(fos, password);
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {

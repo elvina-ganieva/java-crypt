@@ -1,15 +1,15 @@
 package org.example.enums;
 
 public enum KeyStoreType {
-    JKS("keystore.jks"), JCEKS("keystore.jceks"), PKCS12("keystore.p12");
+    JKS(".jks"), JCEKS(".jceks"), PKCS12(".p12");
 
-    private final String fileName;
+    private final String fileExtension;
 
-    KeyStoreType(String fileName) {
-        this.fileName = fileName;
+    KeyStoreType(String fileExtention) {
+        this.fileExtension = fileExtention;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getFileExtension() {
+        return fileExtension;
     }
 }

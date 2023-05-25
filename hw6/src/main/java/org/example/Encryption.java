@@ -18,14 +18,15 @@ public class Encryption {
 
         var randomService = new RandomService();
         var keyStoreType = randomService.getRandomKeyStoreType(randomMode);
+        var keyStoreFileName = "keystore" + keyStoreType.getFileExtension();
 
-        var keyStoreService = new KeyStoreService();
-        keyStoreService.createNewKeyStore(keyStoreType, password);
+        var keyStoreService = new KeyStoreService(keyStoreFileName, keyStoreType.name(), password);
+        keyStoreService.createNewKeyStore();
 
         var keyAlias = "rsa-key";
         var keyGeneratorService = new KeyGeneratorService();
         var generator = keyGeneratorService.getCertAndKeyGenerator();
-        keyStoreService.storePrivateKey(generator, keyAlias, keyStoreType, password);
+        keyStoreService.storePrivateKey(generator, keyAlias);
 
         var cipherService = new CipherService();
         var cipheredData = cipherService.cipher(data, generator.getPublicKey());
@@ -42,7 +43,8 @@ public class Encryption {
         var dataTransferService = new DataTransferService();
         dataTransferService.writeObject(new Dto(
                 cipheredData,
-                keyStoreType,
+                keyStoreType.name(),
+                keyStoreFileName,
                 password,
                 generator.getPublicKey(),
                 keyAlias,
